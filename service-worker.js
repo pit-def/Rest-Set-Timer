@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rest-timer-v3';
+const CACHE_NAME = 'rest-timer-v4';
 const ASSETS = [
     './',
     './index.html',
