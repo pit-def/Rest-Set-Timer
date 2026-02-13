@@ -150,14 +150,16 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 320px;
+    min-height: 280px;
+    /* Reduced from 320px to fit better */
     position: relative;
 }
 
 .timer-ring-container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 260px;
+    /* Reduced from 280px */
+    height: 260px;
 }
 
 /* Glow effect behind the ring */
