@@ -587,3 +587,20 @@ input:checked+.slider:before {
     transform: scale(0.98);
     opacity: 0.9;
 }
+
+/* Version Footer */
+.modal-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.version-text {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-top: -8px;
+    /* Pull it up a bit closer to button if needed, or just rely on gap */
+}

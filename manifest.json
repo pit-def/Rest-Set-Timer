@@ -1,23 +1,32 @@
 {
     "name": "Rest Set Timer",
     "short_name": "Rest Set Timer",
-    "id": "/",
+    "description": "Minimalist gym rest timer with set counter.",
+    "id": "rest-set-timer-app",
     "scope": "/",
-    "start_url": "./index.html",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#050505",
     "theme_color": "#050505",
-    "orientation": "portrait-primary",
+    "orientation": "portrait",
     "icons": [
         {
             "src": "assets/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
         },
         {
             "src": "assets/icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ]
 }

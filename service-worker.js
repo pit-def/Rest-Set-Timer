@@ -1,12 +1,13 @@
-const CACHE_NAME = 'rest-set-timer-v2';
+const CACHE_NAME = 'rest-timer-v3';
 const ASSETS = [
     './',
     './index.html',
     './styles.css',
     './app.js',
+    './manifest.json',
+    './assets/beep.mp3',
     './assets/icon-192.png',
-    './assets/icon-512.png',
-    './assets/beep.mp3'
+    './assets/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
