@@ -56,6 +56,32 @@ const App = {
         }
     },
 
+    // --- WAKE LOCK ---
+    WakeLock: {
+        sentinel: null,
+
+        async request() {
+            if ('wakeLock' in navigator) {
+                try {
+                    this.sentinel = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock active');
+                    this.sentinel.addEventListener('release', () => {
+                        console.log('Wake Lock released');
+                    });
+                } catch (err) {
+                    console.error('Wake Lock failed:', err);
+                }
+            }
+        },
+
+        async release() {
+            if (this.sentinel) {
+                await this.sentinel.release();
+                this.sentinel = null;
+            }
+        }
+    },
+
     // --- TIMER ENGINE ---
     Timer: {
         start(duration) {
@@ -85,6 +111,10 @@ const App = {
             App.State.timer.endTime = Date.now() + App.State.timer.remaining;
 
             App.UI.updateControls();
+
+            // Request Wake Lock to prevent screen sleep -> rAF pause
+            App.WakeLock.request();
+
             this.loop();
         },
 
@@ -92,6 +122,7 @@ const App = {
             App.State.timer.status = 'PAUSED';
             cancelAnimationFrame(App.State.timer.animationFrame);
             App.UI.updateControls();
+            App.WakeLock.release();
         },
 
         reset() {
@@ -101,6 +132,7 @@ const App = {
 
             App.UI.renderTimer(App.State.timer.remaining, 1);
             App.UI.updateControls();
+            App.WakeLock.release();
         },
 
         loop() {
@@ -123,6 +155,7 @@ const App = {
             cancelAnimationFrame(App.State.timer.animationFrame);
             App.UI.renderTimer(0, 0);
             App.UI.updateControls();
+            App.WakeLock.release();
 
             this.notify();
 
@@ -142,7 +175,13 @@ const App = {
                 }
             }
             if (App.State.settings.vibrationEnabled && navigator.vibrate) {
-                navigator.vibrate([500, 200, 500]);
+                // Try-catch for vibration to avoid errors causing issues
+                try {
+                    const success = navigator.vibrate([500, 200, 500]);
+                    if (!success) console.log('Vibration failed (user gesture required?)');
+                } catch (err) {
+                    console.error('Vibration error:', err);
+                }
             }
         }
     },

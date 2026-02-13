@@ -1,6 +1,8 @@
 {
     "name": "Rest Set Timer",
-    "short_name": "RestTimer",
+    "short_name": "Rest Set Timer",
+    "id": "/",
+    "scope": "/",
     "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#050505",

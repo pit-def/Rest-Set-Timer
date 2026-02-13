@@ -57,53 +57,55 @@
             </div>
         </section>
 
-        <!-- Presets -->
-        <section class="presets-section">
-            <div class="section-label">Interval Presets</div>
-            <div class="presets-grid" id="presets-grid">
-                <!-- Row 1 -->
-                <button class="preset-card" data-seconds="15">15s</button>
-                <button class="preset-card" data-seconds="30">30s</button>
-                <button class="preset-card active" data-seconds="60">60s</button>
-                <!-- Row 2 -->
-                <button class="preset-card" data-seconds="90">90s</button>
-                <button class="preset-card" data-seconds="120">2m</button>
-                <button class="preset-card" data-seconds="180">3m</button>
-                <!-- Row 3 -->
-                <button class="preset-card" data-seconds="300">5m</button>
-                <button class="preset-card" id="btn-custom-1" data-custom="1">
-                    <span>C1</span>
-                    <span class="sub-text" id="lbl-custom-1">0:45</span>
-                </button>
-                <button class="preset-card" id="btn-custom-2" data-custom="2">
-                    <span>C2</span>
-                    <span class="sub-text" id="lbl-custom-2">--:--</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Set Counter -->
-        <section class="sets-section">
-            <div class="sets-container">
-                <div class="sets-content">
-                    <span class="sets-title">Set Count</span>
-                    <div class="sets-display">
-                        <span class="sets-value" id="set-current">04</span>
-                        <span class="sets-target">/ <span id="set-target">10</span></span>
-                    </div>
-                </div>
-                <div class="btn-reset-container">
-                    <button id="btn-reset-sets-main" class="btn-reset-sets">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                            <path d="M3 3v5h5"></path>
-                        </svg>
-                        Reset
+        <div class="controls-column">
+            <!-- Presets -->
+            <section class="presets-section">
+                <div class="section-label">Interval Presets</div>
+                <div class="presets-grid" id="presets-grid">
+                    <!-- Row 1 -->
+                    <button class="preset-card" data-seconds="15">15s</button>
+                    <button class="preset-card" data-seconds="30">30s</button>
+                    <button class="preset-card active" data-seconds="60">60s</button>
+                    <!-- Row 2 -->
+                    <button class="preset-card" data-seconds="90">90s</button>
+                    <button class="preset-card" data-seconds="120">2m</button>
+                    <button class="preset-card" data-seconds="180">3m</button>
+                    <!-- Row 3 -->
+                    <button class="preset-card" data-seconds="300">5m</button>
+                    <button class="preset-card" id="btn-custom-1" data-custom="1">
+                        <span>C1</span>
+                        <span class="sub-text" id="lbl-custom-1">0:45</span>
+                    </button>
+                    <button class="preset-card" id="btn-custom-2" data-custom="2">
+                        <span>C2</span>
+                        <span class="sub-text" id="lbl-custom-2">--:--</span>
                     </button>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- Set Counter -->
+            <section class="sets-section">
+                <div class="sets-container">
+                    <div class="sets-content">
+                        <span class="sets-title">Set Count</span>
+                        <div class="sets-display">
+                            <span class="sets-value" id="set-current">04</span>
+                            <span class="sets-target">/ <span id="set-target">10</span></span>
+                        </div>
+                    </div>
+                    <div class="btn-reset-container">
+                        <button id="btn-reset-sets-main" class="btn-reset-sets">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <!-- Settings Modal -->
