@@ -1,0 +1,559 @@
+:root {
+    /* Colors - Redesign (Dark & Orange) */
+    --bg-dark: #050505;
+    --bg-card: #121212;
+    --bg-card-hover: #1e1e1e;
+
+    /* Orange Gradient */
+    --primary: #ff4b1f;
+    --primary-grad-start: #ff9068;
+    --primary-grad-end: #ff4b1f;
+    --primary-glow: rgba(255, 75, 31, 0.3);
+
+    --text-main: #ffffff;
+    --text-muted: #666666;
+
+    --circle-track: #1a1a1a;
+
+    --danger: #cf352e;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 40px;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    /* App-like feel */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-dark);
+    /* Subtle warm lighting from top left */
+    background: radial-gradient(circle at top left, #2a1005 0%, var(--bg-dark) 40%);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Prevent scrolling body */
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: center;
+    /* Centered Title */
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    height: 60px;
+    position: relative;
+}
+
+.app-header h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #e0e0e0;
+    letter-spacing: -0.5px;
+}
+
+.icon-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    transition: all 0.2s;
+    position: absolute;
+}
+
+#btn-settings {
+    right: 20px;
+}
+
+.icon-btn:active {
+    background: #333;
+    color: white;
+    transform: scale(0.95);
+}
+
+.app-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 var(--spacing-lg) var(--spacing-lg);
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+    overflow-y: auto;
+    /* Allow content scroll if needed on small screens */
+}
+
+/* Timer Display */
+.timer-display {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 320px;
+    position: relative;
+}
+
+.timer-ring-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+}
+
+/* Glow effect behind the ring */
+.timer-ring-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(255, 75, 31, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.timer-ring {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.timer-ring-track {
+    stroke: var(--circle-track);
+    stroke-width: 8;
+    fill: none;
+}
+
+/* Gradient for SVG stroke needs defs in HTML, or we use a solid color fallback */
+.timer-ring-progress {
+    stroke: url(#gradient-orange);
+    /* We will add this def to HTML */
+    stroke-width: 8;
+    stroke-linecap: round;
+    fill: none;
+    stroke-dasharray: 816.8;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.1s linear;
+    filter: drop-shadow(0 0 10px rgba(255, 75, 31, 0.5));
+    /* Orange glow */
+}
+
+.timer-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#timer-time {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-hint {
+    margin-top: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--primary);
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+.timer-hint:active {
+    opacity: 0.6;
+}
+
+.timer-hint svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+/* Presets */
+.presets-section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #444;
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.presets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 Columns */
+    gap: var(--spacing-sm);
+}
+
+.preset-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #ccc;
+    border: 1px solid transparent;
+    /* Prevent layout shift */
+    transition: all 0.1s;
+    position: relative;
+    overflow: hidden;
+}
+
+.preset-card span.sub-text {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #666;
+    margin-top: 2px;
+}
+
+.preset-card:active {
+    transform: scale(0.98);
+    background: #222;
+}
+
+.preset-card.active {
+    color: var(--primary);
+    border: 1px solid rgba(255, 75, 31, 0.4);
+    background: rgba(255, 75, 31, 0.05);
+}
+
+/* Set Counter - Redesign */
+.sets-container {
+    background: var(--bg-card);
+    border-radius: 32px;
+    /* Super rounded */
+    padding: var(--spacing-lg) var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    min-height: 100px;
+}
+
+.sets-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sets-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #555;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.sets-value {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--primary);
+    /* Orange */
+    letter-spacing: -2px;
+}
+
+.sets-target {
+    font-size: 1.5rem;
+    color: #444;
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+.btn-reset-container {
+    display: flex;
+    align-items: center;
+}
+
+.btn-reset-sets {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #555;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px;
+    transition: color 0.2s;
+}
+
+.btn-reset-sets:active {
+    color: #888;
+}
+
+/* Settings Modal - Redesign */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    /* Darker backdrop */
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    /* Center on screen */
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+.modal.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: #161616;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid #222;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    color: white;
+    margin: 0;
+}
+
+.modal-close {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    padding: 8px;
+}
+
+/* Scrollable Picker Styles */
+.picker-group {
+    margin-bottom: 24px;
+}
+
+.picker-label {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 12px;
+    font-weight: 600;
+    display: block;
+}
+
+.time-picker-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    background: #0a0a0a;
+    padding: 16px;
+    border-radius: 16px;
+    position: relative;
+}
+
+/* Decoration for selected item */
+.time-picker-container::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    right: 10px;
+    height: 32px;
+    transform: translateY(-50%);
+    background: rgba(255, 75, 31, 0.1);
+    border-radius: 8px;
+    pointer-events: none;
+    border: 1px solid rgba(255, 75, 31, 0.2);
+}
+
+.picker-column {
+    height: 100px;
+    width: 60px;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    text-align: center;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 34px 0;
+    /* Padding to allow top/bottom items to center */
+}
+
+.picker-column::-webkit-scrollbar {
+    display: none;
+}
+
+.picker-item {
+    height: 32px;
+    line-height: 32px;
+    scroll-snap-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: color 0.2s, transform 0.2s;
+}
+
+/* JS will add .selected class to the centered item */
+.picker-item.selected {
+    color: white;
+    font-size: 1.3rem;
+}
+
+.picker-unit {
+    position: absolute;
+    font-size: 0.7rem;
+    color: #444;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+/* Toggle Rows */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #222;
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-text {
+    font-size: 1rem;
+    color: #ccc;
+    font-weight: 500;
+}
+
+/* Custom Switch for Orange Theme */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    transition: .3s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--primary);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+.btn-primary-block {
+    background: linear-gradient(to right, var(--primary-grad-start), var(--primary-grad-end));
+    color: white;
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 24px;
+    box-shadow: 0 4px 15px rgba(255, 75, 31, 0.3);
+}
+
+.btn-primary-block:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
