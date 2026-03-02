@@ -42,5 +42,4 @@
 ## Future Enhancements
 - [ ] PWA Installation (Add manifest & Service Worker).
 - [ ] Wake Lock API integration (keep screen on).
-- [ ] Multiple workout profiles (e.g., "Strength", "Hypertrophy" presets).
 - [ ] Theme selector.

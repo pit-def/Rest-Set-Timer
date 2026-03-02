@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rest-timer-v4';
+const CACHE_NAME = 'rest-timer-v5';
 const ASSETS = [
     './',
     './index.html',
@@ -19,5 +19,24 @@ self.addEventListener('install', (e) => {
 self.addEventListener('fetch', (e) => {
     e.respondWith(
         caches.match(e.request).then((response) => response || fetch(e.request))
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+
+    // Focus the existing window or open a new one
+    event.waitUntil(
+        clients.matchAll({ type: 'window' }).then((windowClients) => {
+            for (let i = 0; i < windowClients.length; i++) {
+                const client = windowClients[i];
+                if (client.url.includes('/') && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow('/');
+            }
+        })
     );
 });

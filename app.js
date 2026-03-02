@@ -20,10 +20,76 @@ const App = {
             soundEnabled: true,
             vibrationEnabled: true,
             startOnPreset: false,
+            notificationsEnabled: false,
+            hasPromptedNotifications: false,
             targetSets: 10,
             // Custom Presets (in seconds)
             custom1: 45,
             custom2: 0 // 0 means unset/hidden
+        }
+    },
+
+    // --- NOTIFICATIONS & AUDIO UNLOCK ---
+    Notifications: {
+        audioUnlocked: false,
+
+        unlockAudio() {
+            if (this.audioUnlocked) return;
+            const audio = document.getElementById('timer-sound');
+            if (audio) {
+                audio.volume = 0;
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.volume = 1;
+                    this.audioUnlocked = true;
+                }).catch(e => console.log('Audio unlock failed:', e));
+            }
+        },
+
+        async requestPermission() {
+            if (!('Notification' in window)) return false;
+            
+            if (Notification.permission === 'granted') {
+                App.State.settings.notificationsEnabled = true;
+                return true;
+            }
+            
+            if (Notification.permission !== 'denied') {
+                try {
+                    const permission = await Notification.requestPermission();
+                    App.State.settings.notificationsEnabled = (permission === 'granted');
+                    App.Storage.save();
+                    return App.State.settings.notificationsEnabled;
+                } catch (e) {
+                    console.error('Notification permission error:', e);
+                }
+            }
+            
+            App.State.settings.notificationsEnabled = false;
+            App.Storage.save();
+            return false;
+        },
+
+        async sendBackgroundAlert() {
+            if (!('Notification' in window)) return;
+            if (document.visibilityState !== 'hidden') return;
+            
+            if (Notification.permission === 'granted' && App.State.settings.notificationsEnabled) {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.ready;
+                        registration.showNotification('Rest Complete!', {
+                            body: 'Time for your next set.',
+                            icon: 'assets/icon-192.png',
+                            vibrate: [500, 200, 500],
+                            requireInteraction: true
+                        });
+                    } catch (e) {
+                        console.error('Service worker notification failed:', e);
+                    }
+                }
+            }
         }
     },
 
@@ -183,6 +249,8 @@ const App = {
                     console.error('Vibration error:', err);
                 }
             }
+
+            App.Notifications.sendBackgroundAlert();
         }
     },
 
@@ -262,6 +330,7 @@ const App = {
                 settingSound: document.getElementById('setting-sound'),
                 settingVibration: document.getElementById('setting-vibration'),
                 settingStartPreset: document.getElementById('setting-start-preset'),
+                settingNotifications: document.getElementById('setting-notifications'),
 
                 // Picker Containers
                 pickerC1: document.getElementById('picker-c1'),
@@ -273,12 +342,36 @@ const App = {
         bindEvents() {
             const els = this.elements;
 
+            // Global tap to unlock audio
+            const unlockAudioOnce = () => {
+                App.Notifications.unlockAudio();
+                document.removeEventListener('touchstart', unlockAudioOnce);
+                document.removeEventListener('click', unlockAudioOnce);
+            };
+            document.addEventListener('touchstart', unlockAudioOnce, { once: true });
+            document.addEventListener('click', unlockAudioOnce, { once: true });
+
+            const handleStartInteraction = (callback) => {
+                if (!App.State.settings.hasPromptedNotifications) {
+                    App.State.settings.hasPromptedNotifications = true;
+                    App.Storage.save();
+                    App.Notifications.requestPermission().then(() => {
+                        if (els.settingNotifications) els.settingNotifications.checked = App.State.settings.notificationsEnabled;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            };
+
             // Timer Trigger (Tap the timer area or hint)
             els.btnStartHint.addEventListener('click', () => {
                 if (App.State.timer.status === 'RUNNING') {
                     App.Timer.pause();
                 } else {
-                    App.Timer.start();
+                    handleStartInteraction(() => {
+                        App.Timer.start();
+                    });
                 }
             });
             // Make the big time text clickable too?
@@ -289,19 +382,21 @@ const App = {
                 const card = e.target.closest('.preset-card');
                 if (!card) return;
 
-                if (card.dataset.seconds) {
-                    App.Logic.setDuration(parseInt(card.dataset.seconds));
-                } else if (card.dataset.custom) {
-                    const id = parseInt(card.dataset.custom);
-                    const val = id === 1 ? App.State.settings.custom1 : App.State.settings.custom2;
+                handleStartInteraction(() => {
+                    if (card.dataset.seconds) {
+                        App.Logic.setDuration(parseInt(card.dataset.seconds));
+                    } else if (card.dataset.custom) {
+                        const id = parseInt(card.dataset.custom);
+                        const val = id === 1 ? App.State.settings.custom1 : App.State.settings.custom2;
 
-                    if (val && val > 0) {
-                        App.Logic.setDuration(val);
-                    } else {
-                        // If empty, open settings
-                        this.openSettings();
+                        if (val && val > 0) {
+                            App.Logic.setDuration(val);
+                        } else {
+                            // If empty, open settings
+                            this.openSettings();
+                        }
                     }
-                }
+                });
             });
 
             // Set Counter
@@ -342,6 +437,9 @@ const App = {
             this.elements.settingSound.checked = s.soundEnabled;
             this.elements.settingVibration.checked = s.vibrationEnabled;
             this.elements.settingStartPreset.checked = s.startOnPreset;
+            if (this.elements.settingNotifications) {
+                this.elements.settingNotifications.checked = s.notificationsEnabled;
+            }
 
             this.elements.modalSettings.classList.remove('hidden');
         },
@@ -358,6 +456,18 @@ const App = {
             s.soundEnabled = els.settingSound.checked;
             s.vibrationEnabled = els.settingVibration.checked;
             s.startOnPreset = els.settingStartPreset.checked;
+
+            if (els.settingNotifications) {
+                const wantsNotifications = els.settingNotifications.checked;
+                if (wantsNotifications && !s.notificationsEnabled) {
+                    App.Notifications.requestPermission().then(granted => {
+                        els.settingNotifications.checked = granted;
+                        App.Storage.save();
+                    });
+                } else {
+                    s.notificationsEnabled = wantsNotifications;
+                }
+            }
 
             // Save Pickers
             s.custom1 = this.pickers.c1.getValue();
