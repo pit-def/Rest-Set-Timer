@@ -37,35 +37,42 @@ const App = {
             if (this.audioUnlocked) return;
             const audio = document.getElementById('timer-sound');
             if (audio) {
-                audio.volume = 0;
-                audio.play().then(() => {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audio.volume = 1;
-                    this.audioUnlocked = true;
-                }).catch(e => console.log('Audio unlock failed:', e));
+                // Simply loading the audio in a user gesture is enough to unlock it on iOS,
+                // and avoids play/pause Promise races that break Chrome Web.
+                audio.load();
+                this.audioUnlocked = true;
             }
         },
 
-        async requestPermission() {
-            if (!('Notification' in window)) return false;
-            
+        async requestPermission(explicitUserAction = false) {
+            if (!('Notification' in window)) {
+                if (explicitUserAction) alert("Notifications are not supported on this browser/device.");
+                return false;
+            }
+
             if (Notification.permission === 'granted') {
                 App.State.settings.notificationsEnabled = true;
                 return true;
             }
-            
+
             if (Notification.permission !== 'denied') {
                 try {
                     const permission = await Notification.requestPermission();
-                    App.State.settings.notificationsEnabled = (permission === 'granted');
-                    App.Storage.save();
-                    return App.State.settings.notificationsEnabled;
+                    if (permission === 'granted') {
+                        App.State.settings.notificationsEnabled = true;
+                        App.Storage.save();
+                        return true;
+                    } else if (explicitUserAction) {
+                        alert("Permission to send notifications was not granted.");
+                    }
                 } catch (e) {
                     console.error('Notification permission error:', e);
+                    if (explicitUserAction) alert("Error requesting notification permissions.");
                 }
+            } else if (explicitUserAction) {
+                alert("Notifications are permanently blocked by your browser settings. Please enable them for this site to use background alerts.");
             }
-            
+
             App.State.settings.notificationsEnabled = false;
             App.Storage.save();
             return false;
@@ -74,7 +81,7 @@ const App = {
         async sendBackgroundAlert() {
             if (!('Notification' in window)) return;
             if (document.visibilityState !== 'hidden') return;
-            
+
             if (Notification.permission === 'granted' && App.State.settings.notificationsEnabled) {
                 if ('serviceWorker' in navigator) {
                     try {
@@ -460,7 +467,7 @@ const App = {
             if (els.settingNotifications) {
                 const wantsNotifications = els.settingNotifications.checked;
                 if (wantsNotifications && !s.notificationsEnabled) {
-                    App.Notifications.requestPermission().then(granted => {
+                    App.Notifications.requestPermission(true).then(granted => {
                         els.settingNotifications.checked = granted;
                         App.Storage.save();
                     });
