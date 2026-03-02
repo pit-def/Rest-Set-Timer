@@ -3,6 +3,7 @@
  */
 
 const App = {
+    timerWorker: null,
     // --- STATE ---
     State: {
         timer: {
@@ -23,6 +24,7 @@ const App = {
             notificationsEnabled: false,
             hasPromptedNotifications: false,
             targetSets: 10,
+            theme: 'orange', // Default theme
             // Custom Presets (in seconds)
             custom1: 45,
             custom2: 0 // 0 means unset/hidden
@@ -189,11 +191,16 @@ const App = {
             // Request Wake Lock to prevent screen sleep -> rAF pause
             App.WakeLock.request();
 
+            if (App.timerWorker) {
+                App.timerWorker.postMessage('start');
+            }
+
             this.loop();
         },
 
         pause() {
             App.State.timer.status = 'PAUSED';
+            if (App.timerWorker) App.timerWorker.postMessage('stop');
             cancelAnimationFrame(App.State.timer.animationFrame);
             App.UI.updateControls();
             App.WakeLock.release();
@@ -201,6 +208,7 @@ const App = {
 
         reset() {
             App.State.timer.status = 'IDLE';
+            if (App.timerWorker) App.timerWorker.postMessage('stop');
             cancelAnimationFrame(App.State.timer.animationFrame);
             App.State.timer.remaining = App.State.timer.total;
 
@@ -226,6 +234,7 @@ const App = {
         complete() {
             App.State.timer.status = 'IDLE';
             App.State.timer.remaining = 0;
+            if (App.timerWorker) App.timerWorker.postMessage('stop');
             cancelAnimationFrame(App.State.timer.animationFrame);
             App.UI.renderTimer(0, 0);
             App.UI.updateControls();
@@ -311,6 +320,23 @@ const App = {
             App.UI.renderSets();
             // Default 60s - Do not auto-start on load
             App.Logic.setDuration(60, false);
+
+            // Apply theme on load
+            document.body.setAttribute('data-theme', App.State.settings.theme || 'orange');
+
+            // Setup Timer Web Worker for background reliability
+            if (window.Worker) {
+                App.timerWorker = new Worker('timer-worker.js');
+                App.timerWorker.onmessage = (e) => {
+                    if (e.data === 'tick' && App.State.timer.status === 'RUNNING') {
+                        const now = Date.now();
+                        const remaining = App.State.timer.endTime - now;
+                        if (remaining <= 0) {
+                            App.Timer.complete();
+                        }
+                    }
+                };
+            }
         },
 
         cacheElements() {
@@ -344,6 +370,9 @@ const App = {
                 pickerC1: document.getElementById('picker-c1'),
                 pickerC2: document.getElementById('picker-c2'),
                 pickerTargetSets: document.getElementById('picker-target-sets'),
+
+                // Themes
+                themeDots: document.querySelectorAll('.theme-dot'),
             };
         },
 
@@ -420,6 +449,16 @@ const App = {
                 if (e.target === els.modalSettings) this.closeSettings();
             });
 
+            // Theme Picker Click
+            els.themeDots.forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    els.themeDots.forEach(d => d.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                    // Preview dynamically
+                    document.body.setAttribute('data-theme', e.currentTarget.dataset.color);
+                });
+            });
+
             // Spacebar
             document.addEventListener('keydown', (e) => {
                 if (e.code === 'Space') {
@@ -448,6 +487,11 @@ const App = {
             if (this.elements.settingNotifications) {
                 this.elements.settingNotifications.checked = s.notificationsEnabled;
             }
+
+            // Load theme dots
+            this.elements.themeDots.forEach(dot => {
+                dot.classList.toggle('selected', dot.dataset.color === (s.theme || 'orange'));
+            });
 
             this.elements.modalSettings.classList.remove('hidden');
         },
@@ -484,6 +528,12 @@ const App = {
             const newTarget = this.pickers.targetSets.getValue();
             App.State.sets.target = newTarget;
             s.targetSets = newTarget;
+
+            // Save Theme
+            const selectedThemeDot = Array.from(els.themeDots).find(d => d.classList.contains('selected'));
+            if (selectedThemeDot) {
+                s.theme = selectedThemeDot.dataset.color;
+            }
 
             App.Storage.save();
             App.UI.renderSets(); // Update UI immediately

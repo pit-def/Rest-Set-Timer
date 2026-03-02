@@ -1,22 +1,51 @@
 :root {
-    /* Colors - Redesign (Dark & Orange) */
+    /* Base Dark Layout Config */
     --bg-dark: #050505;
     --bg-card: #121212;
     --bg-card-hover: #1e1e1e;
-
-    /* Orange Gradient */
-    --primary: #ff4b1f;
-    --primary-grad-start: #ff9068;
-    --primary-grad-end: #ff4b1f;
-    --primary-glow: rgba(255, 75, 31, 0.3);
-
     --text-main: #ffffff;
     --text-muted: #666666;
-
     --circle-track: #1a1a1a;
-
     --danger: #cf352e;
+}
 
+/* Orange Theme (Default) */
+body[data-theme="orange"] {
+    --primary: #ff4b1f;
+    --primary-rgb: 255, 75, 31;
+    --primary-grad-start: #ff9068;
+    --primary-grad-end: #ff4b1f;
+    --bg-glow: #2a1005;
+}
+
+/* Yellow Theme */
+body[data-theme="yellow"] {
+    --primary: #f9d423;
+    --primary-rgb: 249, 212, 35;
+    --primary-grad-start: #f8ed86;
+    --primary-grad-end: #f9d423;
+    --bg-glow: #2a2505;
+}
+
+/* Green Theme */
+body[data-theme="green"] {
+    --primary: #00b09b;
+    --primary-rgb: 0, 176, 155;
+    --primary-grad-start: #96c93d;
+    --primary-grad-end: #00b09b;
+    --bg-glow: #052a18;
+}
+
+/* Blue Theme */
+body[data-theme="blue"] {
+    --primary: #00c6ff;
+    --primary-rgb: 0, 198, 255;
+    --primary-grad-start: #0072ff;
+    --primary-grad-end: #00c6ff;
+    --bg-glow: #05162a;
+}
+
+:root {
     /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -44,7 +73,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--bg-dark);
     /* Subtle warm lighting from top left */
-    background: radial-gradient(circle at top left, #2a1005 0%, var(--bg-dark) 40%);
+    background: radial-gradient(circle at top left, var(--bg-glow) 0%, var(--bg-dark) 40%);
     color: var(--text-main);
     height: 100vh;
     height: 100dvh;
@@ -171,7 +200,7 @@ button {
     transform: translate(-50%, -50%);
     width: 240px;
     height: 240px;
-    background: radial-gradient(circle, rgba(255, 75, 31, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.15) 0%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
 }
@@ -198,8 +227,8 @@ button {
     stroke-dasharray: 816.8;
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.1s linear;
-    filter: drop-shadow(0 0 10px rgba(255, 75, 31, 0.5));
-    /* Orange glow */
+    filter: drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.5));
+    /* Neon glow */
 }
 
 .timer-text {
@@ -299,8 +328,8 @@ button {
 
 .preset-card.active {
     color: var(--primary);
-    border: 1px solid rgba(255, 75, 31, 0.4);
-    background: rgba(255, 75, 31, 0.05);
+    border: 1px solid rgba(var(--primary-rgb), 0.4);
+    background: rgba(var(--primary-rgb), 0.05);
 }
 
 /* Set Counter - Redesign */
@@ -440,6 +469,46 @@ button {
     display: block;
 }
 
+/* Theme Picker Styles */
+.theme-picker {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    padding: 10px;
+}
+
+.theme-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+    outline: none;
+    cursor: pointer;
+}
+
+.theme-dot[data-color="orange"] {
+    background: linear-gradient(135deg, #ff9068, #ff4b1f);
+}
+
+.theme-dot[data-color="yellow"] {
+    background: linear-gradient(135deg, #f8ed86, #f9d423);
+}
+
+.theme-dot[data-color="green"] {
+    background: linear-gradient(135deg, #96c93d, #00b09b);
+}
+
+.theme-dot[data-color="blue"] {
+    background: linear-gradient(135deg, #0072ff, #00c6ff);
+}
+
+.theme-dot.selected {
+    transform: scale(1.15);
+    border-color: white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
 .time-picker-container {
     display: flex;
     gap: 12px;
@@ -459,10 +528,10 @@ button {
     right: 10px;
     height: 32px;
     transform: translateY(-50%);
-    background: rgba(255, 75, 31, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
     border-radius: 8px;
     pointer-events: none;
-    border: 1px solid rgba(255, 75, 31, 0.2);
+    border: 1px solid rgba(var(--primary-rgb), 0.2);
 }
 
 .picker-column {
@@ -580,7 +649,7 @@ input:checked+.slider:before {
     font-weight: 700;
     font-size: 1rem;
     margin-top: 24px;
-    box-shadow: 0 4px 15px rgba(255, 75, 31, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
 }
 
 .btn-primary-block:active {

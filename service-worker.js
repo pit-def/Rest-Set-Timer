@@ -1,9 +1,10 @@
-const CACHE_NAME = 'rest-timer-v7';
+const CACHE_NAME = 'rest-timer-v8';
 const ASSETS = [
     './',
     './index.html',
     './styles.css',
     './app.js',
+    './timer-worker.js',
     './manifest.json',
     './assets/beep.mp3',
     './assets/icon-192.png',
