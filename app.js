@@ -78,10 +78,11 @@ const App = {
             return false;
         },
 
-        async sendBackgroundAlert() {
+        async sendSystemAlert() {
             if (!('Notification' in window)) return;
-            if (document.visibilityState !== 'hidden') return;
 
+            // Fire native notification even in foreground to bypass mobile Chrome 
+            // vibration and audio throttling which blocks them after ~10 seconds of no interaction.
             if (Notification.permission === 'granted' && App.State.settings.notificationsEnabled) {
                 if ('serviceWorker' in navigator) {
                     try {
@@ -89,7 +90,7 @@ const App = {
                         registration.showNotification('Rest Complete!', {
                             body: 'Time for your next set.',
                             icon: 'assets/icon-192.png',
-                            vibrate: [500, 200, 500],
+                            vibrate: [1000, 500, 1000], // Stronger vibration pattern
                             requireInteraction: true
                         });
                     } catch (e) {
@@ -257,7 +258,7 @@ const App = {
                 }
             }
 
-            App.Notifications.sendBackgroundAlert();
+            App.Notifications.sendSystemAlert();
         }
     },
 
